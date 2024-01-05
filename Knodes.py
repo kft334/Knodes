@@ -13,7 +13,8 @@ class ImageOutput:
         return {
             "required": {
                 "images": ("IMAGE", {"default": None, "forceInput": True}),
-                "text": ("STRING", {"default": None})}
+                "text": ("STRING", {"default": None})},
+            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
             }
 
     RETURN_TYPES = ("IMAGE",)
@@ -25,8 +26,9 @@ class ImageOutput:
 
     CATEGORY = "Knodes"
     
-    def Proc(self, images, text = ""):
+    def Proc(self, images, text, prompt=None, extra_pnginfo=None):
         outs = []
+
         for single_image in images:
             img = np.asarray(single_image * 255., dtype=np.uint8)
             img = Image.fromarray(img)
@@ -36,8 +38,9 @@ class ImageOutput:
             outs.append(img_str)
 
         PromptServer.instance.send_sync("knodes", {"images": outs, "text": text})
-        return images
 
+        return (images,)
+        
 NODE_CLASS_MAPPINGS = {
     "Image(s) To Websocket (Base64)": ImageOutput
 }
