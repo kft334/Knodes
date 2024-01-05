@@ -13,8 +13,7 @@ class ImageOutput:
         return {
             "required": {
                 "images": ("IMAGE", {"default": None, "forceInput": True}),
-                "text": ("STRING", {"default": None})},
-            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
+                "text": ("STRING", {"default": None})}
             }
 
     RETURN_TYPES = ("IMAGE",)
@@ -26,7 +25,7 @@ class ImageOutput:
 
     CATEGORY = "Knodes"
     
-    def Proc(self, images, text, prompt=None, extra_pnginfo=None):
+    def Proc(self, images, text = ""):
         outs = []
 
         for single_image in images:
@@ -45,6 +44,9 @@ NODE_CLASS_MAPPINGS = {
     "Image(s) To Websocket (Base64)": ImageOutput
 }
 
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "ImageOutput": "Image(s) To Websocket (Base64)"
+}
 NODE_DISPLAY_NAME_MAPPINGS = {
     "ImageOutput": "Image(s) To Websocket (Base64)"
 }
