@@ -13,7 +13,7 @@ class ImageOutput:
         return {
             "required": {
                 "images": ("IMAGE", {"default": None, "forceInput": True}),
-                "text": ("STRING", {"default": None})}
+                "tag": ("STRING", {"default": None})}
             }
 
     RETURN_TYPES = ("IMAGE",)
@@ -25,7 +25,7 @@ class ImageOutput:
 
     CATEGORY = "Knodes"
     
-    def Proc(self, images, text = ""):
+    def Proc(self, images, tag = ""):
         outs = []
 
         for single_image in images:
@@ -36,7 +36,7 @@ class ImageOutput:
             img_str = base64.b64encode(buffered.getvalue()).decode()
             outs.append(img_str)
 
-        PromptServer.instance.send_sync("knodes", {"images": outs, "text": text})
+        PromptServer.instance.send_sync("knodes", {"images": outs, "text": tag})
 
         return (images,)
         
