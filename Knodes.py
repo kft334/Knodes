@@ -3,6 +3,7 @@ from io import BytesIO
 from PIL import Image
 import numpy as np
 import base64
+import torch
 
 class ImageOutput:
     def __init__(self):
@@ -39,14 +40,48 @@ class ImageOutput:
         PromptServer.instance.send_sync("knodes", {"images": outs, "text": tag})
 
         return (images,)
+    
+class LoadImageBase64:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+            "image": ("STRING", {"multiline": False})}
+            }
+
+    RETURN_TYPES = ("IMAGE",)
+    CATEGORY = "Knodes"
+    FUNCTION = "Proc"
+
+    def Proc(self, image):
+
+        # image is a base64 encoded JObject.
+
+        jObject = base64.b64decode(image)
+
+        # jObject is a JObject with the following structure: [image, image, ...]
+        # where each image is a base64 encoded string.
+
+        images = []
+
+        for single_image in jObject:
+            imgdata = base64.b64decode(single_image)
+            img = Image.open(BytesIO(imgdata))
+
+            img = img.convert("RGB")
+            img = np.array(img).astype(np.float32) / 255.0
+            img = torch.from_numpy(img)[None,]
+
+            images.append(img)
+
+        return (images,)
         
 NODE_CLASS_MAPPINGS = {
-    "Image(s) To Websocket (Base64)": ImageOutput
+    "Image(s) To Websocket (Base64)": ImageOutput,
+    "Load Image(s) From Websocket (Base64)": LoadImageBase64
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "ImageOutput": "Image(s) To Websocket (Base64)"
-}
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "ImageOutput": "Image(s) To Websocket (Base64)"
+    "ImageOutput": "Image(s) To Websocket (Base64)",
+    "LoadImageBase64": "Load Image(s) From Websocket (Base64)"
 }
