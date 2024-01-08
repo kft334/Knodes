@@ -1,3 +1,5 @@
+ComfyUI Nodes
+
 Just two nodes fow now: 
 
 - Image(s) to Websocket (Base64)
