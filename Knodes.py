@@ -79,15 +79,12 @@ class LoadImagesBase64:
     FUNCTION = "Proc"
 
     def Proc(self, strings):
-        
-        # Pop the number of images from the string
         number_of_images = int(strings[:4].lstrip('0'), 16)
         print("Number Of Images: " + str(number_of_images))
         strings = strings[4:]
 
         images = []
         
-        # Structure of the rest of the string: 0xXXXXXXXX (int64) Base64 (string) with 0xXXXXXXXX being the length of the string... repeat number_of_images times
         for i in range(number_of_images):
             length = int(strings[:8].lstrip('0'), 16)
             print("Image #" + str(i) + " Length: " + str(length))
@@ -106,8 +103,6 @@ class LoadImagesBase64:
             img = np.array(img).astype(np.float32) / 255.0
             img = torch.from_numpy(img)[None,]
 
-            # shape is [5, 1, 640, 640, 3] = [n, ?, h, w, c] ... n = number of images, h = height, w = width, c = channels.
-            
             tensors.append(img)
 
         tensors = [img.squeeze(0) for img in tensors]
@@ -116,12 +111,12 @@ class LoadImagesBase64:
         
 NODE_CLASS_MAPPINGS = {
     "Image(s) To Websocket (Base64)": ImageOutput,
-    "Load Image From Websocket (Base64)": LoadImageBase64,
-    "Load Images From Websocket (Base64)": LoadImagesBase64
+    "Load Image (Base64)": LoadImageBase64,
+    "Load Images (Base64)": LoadImagesBase64
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "ImageOutput": "Image(s) To Websocket (Base64)",
-    "LoadImageBase64": "Load Image From Websocket (Base64)",
-    "LoadImageBase64": "Load Images From Websocket (Base64)"
+    "LoadImageBase64": "Load Image (Base64)",
+    "LoadImageBase64": "Load Images (Base64)"
 }
