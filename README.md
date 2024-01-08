@@ -9,12 +9,5 @@ ComfyUI Nodes
 -- Accepts a base64 encoded image and returns a tensor.
 
 - Load Images (Base64)
--- Accepts a string with the following structure:
---- 0xffff (Image count)
---- 0xffffffff (Image1 length)
---- Image1 (base64)
---- ...
---- ...
---- 0xffffffff (ImageN length)
---- ImageN (base64)
+-- Accepts a string with the following structure: 0xffff (Image count) 0xffffffff (Image1 length) Image1 (base64) ... 0xffffffff (ImageN length) ImageN (base64)
 -- Returns tensors for all the images.
