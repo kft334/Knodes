@@ -15,7 +15,7 @@ class ImageOutput:
         return {
             "required": {
                 "images": ("IMAGE", {"default": None, "forceInput": True}),
-                "tag": ("STRING", {"default": None})}
+                "Actions": ("STRING", {"default": None})}
             }
 
     RETURN_TYPES = ("IMAGE",)
@@ -27,7 +27,7 @@ class ImageOutput:
 
     CATEGORY = "Knodes"
     
-    def Proc(self, images, tag = ""):
+    def Proc(self, images, Actions = ""):
         outs = []
 
         for single_image in images:
@@ -38,7 +38,7 @@ class ImageOutput:
             img_str = base64.b64encode(buffered.getvalue()).decode()
             outs.append(img_str)
 
-        PromptServer.instance.send_sync("knodes", {"images": outs, "text": tag})
+        PromptServer.instance.send_sync("knodes", {"images": outs, "Actions": Actions})
 
         return (images,)
 
@@ -83,7 +83,7 @@ class LoadImagesBase64:
         print("Number Of Images: " + str(number_of_images))
         strings = strings[4:]
 
-        images = []
+        images = list()
         
         for i in range(number_of_images):
             length = int(strings[:8].lstrip('0'), 16)
@@ -93,7 +93,7 @@ class LoadImagesBase64:
             strings = strings[length:]
             images.append(single_image)
 
-        tensors = []
+        tensors = list()
 
         for single_image in images:
             imgdata = base64.b64decode(single_image)
@@ -105,10 +105,8 @@ class LoadImagesBase64:
 
             tensors.append(img)
 
-        tensors = [img.squeeze(0) for img in tensors]
-
-        return (tensors,)
-        
+        return (torch.cat(tensors),)
+    
 NODE_CLASS_MAPPINGS = {
     "Image(s) To Websocket (Base64)": ImageOutput,
     "Load Image (Base64)": LoadImageBase64,
