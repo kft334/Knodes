@@ -73,7 +73,7 @@ class LoadImagesBase64:
     def INPUT_TYPES(s):
         return {"required": {"strings": ("STRING", {"multiline": False})}}
 
-    RETURN_TYPES = ("IMAGE",)
+    RETURN_TYPES = ("IMAGE","MASK")
     CATEGORY = "Knodes"
 
     FUNCTION = "Proc"
@@ -94,10 +94,19 @@ class LoadImagesBase64:
             images.append(single_image)
 
         tensors = list()
+        masks = list()
 
         for single_image in images:
             imgdata = base64.b64decode(single_image)
             img = Image.open(BytesIO(imgdata))
+
+            if "A" in img.getbands():
+                mask = np.array(img.getchannel("A")).astype(np.float32) / 255.0
+                mask = 1.0 - torch.from_numpy(mask)
+                masks.append(mask)
+            else:
+                mask = torch.zeros((64, 64), dtype=torch.float32, device="cpu")
+                masks.append(mask)
 
             img = img.convert("RGB")
             img = np.array(img).astype(np.float32) / 255.0
@@ -105,7 +114,7 @@ class LoadImagesBase64:
 
             tensors.append(img)
 
-        return (torch.cat(tensors),)
+        return (torch.cat(tensors), torch.cat(masks))
     
 NODE_CLASS_MAPPINGS = {
     "Image(s) To Websocket (Base64)": ImageOutput,
